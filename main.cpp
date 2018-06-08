@@ -18,7 +18,7 @@ int main() {
 
 int welcome_screen(){
     cout << "ChatNetwork 1.0\n";
-    cout << "Developed by Engr. Eugene Oca\n";
+    cout << "Developed by Eugene Oca\n";
     sleep(1);
     cout << "Loading...\n";
     sleep(1);
