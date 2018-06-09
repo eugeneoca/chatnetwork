@@ -1,6 +1,7 @@
 // Libraries
 #pragma comment(lib, "ws2_32.lib");
 #include <WinSock2.h>
+#include <WS2tcpip.h>
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -34,7 +35,7 @@ int main() {
 }
 
 int welcome_screen(){
-    cout << "ChatNetwork 1.0\n";
+    cout << "ChatNetwork Server 1.0\n";
     cout << "Developed by Eugene Oca\n";
     sleep(1);
     cout << "Loading...\n";
@@ -142,9 +143,50 @@ int create_server(){
     WORD DllVersion = MAKEWORD(2, 1);
     if(WSAStartup(DllVersion, &wsaData) != 0){
         // To fix error, add -lwsock32 at the end of compile commind
-
+        cout << "Failed to start winsock.";
+        return 1;
     }
 
+    SOCKET listener = socket(AF_INET, SOCK_STREAM, 0);
+    if(listener == INVALID_SOCKET){
+        cout << "Can\'t create socket";
+        return 1;
+    }
+
+    sockaddr_in address;
+    address.sin_family = AF_INET;
+    address.sin_port = htons(port);
+    address.sin_addr.s_addr = inet_addr(server_ip.c_str());
+    bind(listener, (sockaddr*)&address, sizeof(address));
+    listen(listener, SOMAXCONN);
+    
+    sockaddr_in client;
+    int clientsize = sizeof(client);
+    SOCKET clientsocket = accept(listener, (sockaddr*)&client, &clientsize);
+
+    char host[NI_MAXHOST];      // Remote name
+    char service[NI_MAXHOST];   // Service Port
+    ZeroMemory(host, NI_MAXHOST);
+    ZeroMemory(service, NI_MAXHOST);
+
+    // Having problem with this block
+    /*if(getnameinfo((sockaddr*)&client, sizeof(client), host, NI_MAXHOST, service, NI_MAXSERV, 0) == 0){
+        cout << host << " is connected on port " << service << "\n";
+    }else{
+        //inet_ntop(AF_INET, &client.sin_addr, host, NI_MAXHOST);
+        //cout << host << " is connected on port " << ntohs(client.sin_port) << "\n";
+    }*/
+
+    closesocket(listener);
+
+    char buff[4096];
+    while(true){
+        ZeroMemory(buff, 4096);
+        int bytesReceived = recv(clientsocket, buff, 4096, 0);
+        
+    }
+
+    closesocket(clientsocket);
     //thread server_instance(process);
     //server_instance.join();
     return 0;
