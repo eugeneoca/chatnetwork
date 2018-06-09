@@ -1,9 +1,12 @@
 // Libraries
+#pragma comment(lib, "ws2_32.lib");
+#include <WinSock2.h>
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <stdlib.h>
 #include <unistd.h>
+#include <thread>
 
 using namespace std;
 
@@ -12,6 +15,7 @@ int welcome_screen();
 string getIPAddress();
 string getSubnet();
 int create_server();
+void process();
 
 // Global Variables
 string server_ip;
@@ -132,4 +136,29 @@ string getSubnet(){
 
 int create_server(){
     // Start creating the server
+
+    // Start winsock
+    WSADATA wsaData;
+    WORD DllVersion = MAKEWORD(2, 1);
+    if(WSAStartup(DllVersion, &wsaData) != 0){
+        // To fix error, add -lwsock32 at the end of compile commind
+
+    }
+
+    //thread server_instance(process);
+    //server_instance.join();
+    return 0;
+}
+
+// State variable
+int started = 0;
+
+void process(){
+    // Process of the server
+    while(1){
+        if(!started){
+            cout << "Server has been started and listening at " << server_ip << ":" << port << "\n";
+            started = 1;
+        }
+    }
 }
