@@ -5,7 +5,7 @@ color 0a
 cls
 
 echo Compiling...
-g++ server.cpp -o server.exe
+g++ server.cpp -o server.exe -lwsock32
 echo Session Starting...
 echo ------------------------
 server.exe
