@@ -176,6 +176,9 @@ int create_server(){
         //inet_ntop(AF_INET, &client.sin_addr, host, NI_MAXHOST);
         //cout << host << " is connected on port " << ntohs(client.sin_port) << "\n";
     }*/
+    if(sizeof(client)!=0){
+        cout << "New connected client!\n";
+    }
 
     closesocket(listener);
 
@@ -183,10 +186,20 @@ int create_server(){
     while(true){
         ZeroMemory(buff, 4096);
         int bytesReceived = recv(clientsocket, buff, 4096, 0);
-        
+        if(bytesReceived == SOCKET_ERROR){
+            cout << "Error in recv().\n";
+            break;
+        }
+        if(bytesReceived == 0){
+            cout << "Client disconnected.\n";
+            break;
+        }
+        send(clientsocket, buff, bytesReceived+1, 0);
+
     }
 
     closesocket(clientsocket);
+    WSACleanup();
     //thread server_instance(process);
     //server_instance.join();
     return 0;
