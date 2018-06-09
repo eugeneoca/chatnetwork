@@ -9,6 +9,7 @@ g++ main.cpp -o main.exe
 echo Session Starting...
 echo ------------------------
 main.exe
+del main.exe
 echo ------------------------
 echo Session ended.
 @echo on
