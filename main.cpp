@@ -11,15 +11,23 @@ using namespace std;
 int welcome_screen();
 string getIPAddress();
 string getSubnet();
+int settings();
 
 // Global Variables
 string client_ip;
 string client_subnet;
 int port = 2000;
 
+string username;
+string server_ip;
+string server_password;
+
 int main() {
     system("cls");
     if(welcome_screen()){
+        return 0;
+    }
+    if(settings()){
         return 0;
     }
     return 0;
@@ -51,7 +59,26 @@ int welcome_screen(){
     client_subnet  = getSubnet();
     cout << "Client IP:\t" << getIPAddress() << "\n";
     cout << "Client Subnet:\t" << getSubnet() << "\n";
-    system(("ping "+client_ip).c_str());
+    cout << "Testing client connectivity...\n";
+    system(("ping " + client_ip + " > test.db").c_str());
+    string container;
+    ifstream Connectivity;
+    int offset;
+    string search = "Request timed out";
+    Connectivity.open("test.db");
+    if(Connectivity.is_open()){
+        while(!Connectivity.eof()){
+            getline(Connectivity, container);
+            if(((offset = container.find(search)) != string::npos) || ((offset = container.find("Usage")) != string::npos) || ((offset = container.find("try again")) != string::npos)){
+                cout << "Connection failed.\n";
+                Connectivity.close();
+                remove("test.db");
+                return 1;
+            }
+        }
+    }
+    Connectivity.close();
+    remove("test.db");
     cout << "Ready.\n";
     sleep(1);
     system("cls");
@@ -59,6 +86,7 @@ int welcome_screen(){
 }
 
 string getIPAddress(){
+    // Get Client IP Address
     system("ipconfig > ip.db");
     string container;
     ifstream IPConfig;
@@ -82,6 +110,7 @@ string getIPAddress(){
 }
 
 string getSubnet(){
+    // Get Client Subnet Mask
     system("ipconfig > ip.db");
     string container;
     ifstream IPConfig;
@@ -103,3 +132,36 @@ string getSubnet(){
     remove("ip.db");
     return "Not Assigned";
 }
+
+int settings(){
+    // Set communication paramters
+    cout << "Username:\t";
+    getline(cin, username);
+    cout << "Server IP:\t";
+    getline(cin, server_ip);
+    cout << "Password:\t";
+    getline(cin, server_password);
+    cout << "Testing server connectivity...\n";
+    system(("ping "+server_ip + " > test.db").c_str());
+    string container;
+    ifstream Connectivity;
+    int offset;
+    string search = "Request timed out";
+    Connectivity.open("test.db");
+    if(Connectivity.is_open()){
+        while(!Connectivity.eof()){
+            getline(Connectivity, container);
+            if(((offset = container.find(search)) != string::npos) || ((offset = container.find("Usage")) != string::npos) || ((offset = container.find("try again")) != string::npos)){
+                cout << "Connection failed.\n";
+                Connectivity.close();
+                remove("test.db");
+                return 1;
+            }
+        }
+    }
+    Connectivity.close();
+    remove("test.db");
+    cout << "Connection success.\n";
+    return 0;
+}
+
